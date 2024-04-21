@@ -31,13 +31,10 @@ def get_all_animals():
 
 
 def get_single_animal(id):
-
     requested_animal = None
-
     for animal in ANIMALS:
         if animal["id"] == id:
             requested_animal = animal
-
     return requested_animal
 
 def create_animal(animal):
@@ -48,19 +45,17 @@ def create_animal(animal):
     return animal
 
 def update_animal(id, new_animal):
-
     for index, animal in enumerate(ANIMALS):
         if animal["id"] == id:
             ANIMALS[index] = new_animal
             break
+    else:
+        create_animal(new_animal)
 
 def delete_animal(id):
-
     animal_index = -1
-
     for index, animal in enumerate(ANIMALS):
         if animal["id"] == id:
             animal_index = index
-            
     if animal_index >= 0:
         ANIMALS.pop(animal_index)
