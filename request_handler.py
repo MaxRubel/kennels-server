@@ -88,7 +88,10 @@ class HandleRequests(BaseHTTPRequestHandler):
                 response = get_all_employees()
 
         if resource == "customers":
-            response = get_all_customers()
+            if id is not None:
+                response = get_single_customer(id)
+            else:
+                response = get_all_customers()
             
         self.wfile.write(json.dumps(response).encode())
 
