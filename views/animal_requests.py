@@ -159,9 +159,10 @@ def update_animal(id, new_animal):
         create_animal(new_animal)
 
 def delete_animal(id):
-    animal_index = -1
-    for index, animal in enumerate(ANIMALS):
-        if animal["id"] == id:
-            animal_index = index
-    if animal_index >= 0:
-        ANIMALS.pop(animal_index)
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        DELETE FROM animal
+        WHERE id = ?
+        """, (id, ))
