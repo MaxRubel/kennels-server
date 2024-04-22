@@ -151,12 +151,33 @@ def create_animal(animal):
     return animal
 
 def update_animal(id, new_animal):
-    for index, animal in enumerate(ANIMALS):
-        if animal["id"] == id:
-            ANIMALS[index] = new_animal
-            break
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        UPDATE Animal
+            SET
+                name = ?,
+                breed = ?,
+                status = ?,
+                location_id = ?,
+                customer_id = ?
+        WHERE id = ?
+        """, (new_animal['name'], new_animal['breed'],
+              new_animal['status'], new_animal['location_id'],
+              new_animal['customer_id'], id, ))
+
+        # Were any rows affected?
+        # Did the client send an `id` that exists?
+        rows_affected = db_cursor.rowcount
+
+    # return value of this function
+    if rows_affected == 0:
+        # Forces 404 response by main module
+        return False
     else:
-        create_animal(new_animal)
+        # Forces 204 response by main module
+        return True
 
 def delete_animal(id):
     with sqlite3.connect("./kennel.sqlite3") as conn:
