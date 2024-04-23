@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Employee
+from models import Employee, Location
 
 EMPLOYEES = [
     {
@@ -12,7 +12,6 @@ EMPLOYEES = [
 def get_all_employees():
     # Open a connection to the database
     with sqlite3.connect("./kennel.sqlite3") as conn:
-
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
 
@@ -20,8 +19,13 @@ def get_all_employees():
         SELECT
             a.id,
             a.name,
-            a.location_id
+            a.location_id,
+            l.id location_id,
+            l.name location_name,
+            l.address location_address
         FROM employee a
+        JOIN Location l
+            ON l.id = a.location_id
         """)
 
         employees = []
@@ -29,11 +33,13 @@ def get_all_employees():
         dataset = db_cursor.fetchall()
 
         for row in dataset:
-
             employee = Employee(row['id'], row['name'], row['location_id'])
+            location = Location(row['location_id'], row['location_name'], row['location_address'])
+            employee.location = location.__dict__
             employees.append(employee.__dict__) 
 
     return employees
+
 
 def get_single_employee(id):
     with sqlite3.connect("./kennel.sqlite3") as conn:
