@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Location
+from models import Location, Employee, Animal
 LOCATIONS = [
     {
         "id": 1,
@@ -22,27 +22,68 @@ def get_all_locations():
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
 
-        # Write the SQL query to get the information you want
+
         db_cursor.execute("""
         SELECT
             a.id,
+            a.name,
             a.address
         FROM location a
         """)
 
-        # Initialize an empty list to hold all animal representations
         locations = []
 
-        # Convert rows of data into a Python list
         dataset = db_cursor.fetchall()
 
-        # Iterate list of data returned from database
         for row in dataset:
-            location = Location(row['id'], row['address'])
-
-            locations.append(location.__dict__) # see the notes below for an explanation on this line of code.
-
-    return locations
+            location = Location(row['id'], row['name'], row['address'])
+            locations.append(location.__dict__) 
+            
+        for location in locations:
+            location_id = location['id']
+            
+            #get employees of location:
+            db_cursor.execute("""
+            SELECT
+                e.id,
+                e.name,
+                e.location_id
+            FROM employee e
+            WHERE e.location_id = ?
+            """,(location_id,))
+            dataset = db_cursor.fetchall()
+            
+            employess = []
+            
+            for row in dataset:
+                employee = Employee(row['id'], row['name'], row['location_id'])
+                employess.append(employee.__dict__)
+                
+            location["employees"] = employess
+            
+            #get animals of location:
+            db_cursor.execute("""
+            SELECT
+                a.id,
+                a.name,
+                a.breed,
+                a.customer_id,
+                a.location_id,
+                a.status
+            FROM animal a
+            WHERE a.location_id = ?
+            """,(location_id,))
+            
+            dataset = db_cursor.fetchall()
+            animals = []
+            
+            for row in dataset:
+                animal = Animal(row['id'], row['name'], row['breed'], row['status'], row['customer_id'], row['location_id'])
+                animals.append(animal.__dict__)
+                
+            location['animals'] = animals
+      
+        return locations
 
 def get_single_location(id):
     with sqlite3.connect("./kennel.sqlite3") as conn:
