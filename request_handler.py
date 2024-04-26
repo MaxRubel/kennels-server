@@ -89,7 +89,7 @@ class HandleRequests(BaseHTTPRequestHandler):
 
                 else:
                     response = get_all_customers()
-
+        
         else: # There is a ? in the path, run the query param functions
                 (resource, query) = parsed
 
