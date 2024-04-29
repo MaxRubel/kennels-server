@@ -73,6 +73,17 @@ def get_all_animals():
 
         return animals
 
+def search(param):
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+        db_cursor.execute("""
+        SELECT
+        *
+        FROM animal a
+        WHERE a.id = ?
+        """, ( id, ))   
+
 
 def get_single_animal(id):
     with sqlite3.connect("./kennel.sqlite3") as conn:
