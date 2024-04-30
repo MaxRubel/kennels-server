@@ -56,9 +56,6 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         parsed = self.parse_url(self.path)
 
-        parsed_search = self.path.split('/')
-        search_value = parsed_search[-1] 
-
         if '?' not in self.path:
             ( resource, id ) = parsed
 
@@ -83,13 +80,8 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = get_single_customer(id)
                 else:
                     response = get_all_customers()
-            if resource == "search":
-                if search_value is not None:
-                    response = search(search_value)
-                else:
-                    response = get_all_animals()
         
-        else: # There is a ? in the path, run the query param functions
+        else: 
                 (resource, query) = parsed
 
                 if query.get('email') and resource == 'customers':
@@ -100,6 +92,8 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = get_animal_by_status(query['status'][0])
                 if query.get("location_id") and resource == 'employees':
                     response = get_employee_by_location_id(query['location_id'][0])
+                if query.get("search") and resource == 'animals':            
+                    response = search(query['search'][0])
 
         self.wfile.write(json.dumps(response).encode())
 
