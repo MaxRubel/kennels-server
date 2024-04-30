@@ -4,26 +4,14 @@ from models import Customer
 
 CUSTOMERS = []
 
-# def get_all_customers():
-#     return CUSTOMERS
-
 def get_all_customers():
-    # Open a connection to the database
     with sqlite3.connect("./kennel.sqlite3") as conn:
 
-        # Just use these. It's a Black Box.
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
 
-        # Write the SQL query to get the information you want
         db_cursor.execute("""
-        SELECT
-            a.id,
-            a.name,
-            a.address,
-            a.email,
-            a.password
-        FROM customer a
+        SELECT * FROM customer a
         """)
 
         
@@ -60,8 +48,6 @@ def get_single_customer(id):
         customer = Customer(data['id'], data['name'], data['address'], data['email'] , data['password'])
 
         return customer.__dict__
-    
-# TODO: you will get an error about the address on customer. Look through the customer model and requests to see if you can solve the issue.
         
 def get_customer_by_email(email):
 
