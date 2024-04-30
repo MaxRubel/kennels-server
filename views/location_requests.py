@@ -42,7 +42,6 @@ def get_all_locations():
         for location in locations:
             location_id = location['id']
             
-            #get employees of location:
             db_cursor.execute("""
             SELECT
                 e.id,
@@ -50,7 +49,7 @@ def get_all_locations():
                 e.location_id
             FROM employee e
             WHERE e.location_id = ?
-            """,(location_id,))
+            """,(location['id'],))
             dataset = db_cursor.fetchall()
             
             employess = []
@@ -95,6 +94,7 @@ def get_single_location(id):
         db_cursor.execute("""
         SELECT
             a.id,
+            a.name,
             a.address
         FROM location a
         WHERE a.id = ?
@@ -104,9 +104,39 @@ def get_single_location(id):
         data = db_cursor.fetchone()
 
         # Create an animal instance from the current row
-        location = Location(data['id'], data['address'])
+        location = Location(data['id'], data['name'], data['address'])
+        employees = []
+        animals = []
+        db_cursor.execute("""
+        SELECT
+        *
+        FROM employee e
+        WHERE e.location_id = ?
+        """, ( id, ))
+        
+        rows = db_cursor.fetchall()
+        for row in rows:
+            employee = Employee(row['id'], row['name'], row['location_id'])
+            employees.append(employee.__dict__)
+        
+        db_cursor.execute("""
+        SELECT
+        *
+        FROM animal a
+        WHERE a.location_id = ?
+        """, ( id, ))
+        
+        rows = db_cursor.fetchall()
+        for row in rows:
+            animal = Animal(row['id'], row['name'], row['breed'], row['status'], row['location_id'], row['customer_id'])
+            animals.append(animal.__dict__)
+        
+        location=location.__dict__
+        location['employees'] = employees
+        location['animals'] = animals
+            
 
-        return location.__dict__
+        return location
 
 def create_location(location):
     max_id = LOCATIONS[-1]["id"]

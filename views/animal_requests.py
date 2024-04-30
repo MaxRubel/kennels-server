@@ -73,8 +73,30 @@ def get_all_animals():
 
         return animals
 
+def search(param):
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+        db_cursor.execute("""
+            SELECT
+            *
+            FROM animal a
+            WHERE a.name LIKE ?
+            """, ('%' + param + '%', ))
+
+        animals = []
+        dataset = db_cursor.fetchall()
+        
+        for row in dataset:
+            animal = Animal(row['id'], row['name'], row['breed'], row['status'],
+            row['location_id'], row['customer_id'])
+            
+            animals.append(animal.__dict__)
+            
+        return animals
 
 def get_single_animal(id):
+    
     with sqlite3.connect("./kennel.sqlite3") as conn:
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()

@@ -49,46 +49,45 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept')
         self.end_headers()
 
-    # Here's a method on the class that overrides the parent's method.
-    # It handles any GET request.
     def do_GET(self):
         self._set_headers(200)
 
         response = {}
 
-        # Parse URL and store entire tuple in a variable
         parsed = self.parse_url(self.path)
 
-        # If the path does not include a query parameter, continue with the original if block
+        parsed_search = self.path.split('/')
+        search_value = parsed_search[-1] 
+
         if '?' not in self.path:
             ( resource, id ) = parsed
 
-            # It's an if..else statement
             if resource == "animals":
                 if id is not None:
                     response = get_single_animal(id)
-
                 else:
                     response = get_all_animals()
 
             if resource == "locations":
                 if id is not None:
                     response = get_single_location(id)
-
                 else:
                     response = get_all_locations()
             if resource == "employees":
                 if id is not None:
                     response = get_single_employee(id)
-
                 else:
                     response = get_all_employees()
             if resource == "customers":
                 if id is not None:
                     response = get_single_customer(id)
-
                 else:
                     response = get_all_customers()
+            if resource == "search":
+                if search_value is not None:
+                    response = search(search_value)
+                else:
+                    response = get_all_animals()
         
         else: # There is a ? in the path, run the query param functions
                 (resource, query) = parsed
