@@ -96,6 +96,7 @@ def search(param):
         return animals
 
 def get_single_animal(id):
+    
     with sqlite3.connect("./kennel.sqlite3") as conn:
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
